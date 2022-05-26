@@ -37,6 +37,17 @@ exports.index = async (request, response) => {
       tourQuery = tourQuery.select('-__v');
     }
 
+    const page = request.query.page * 1 || 1;
+    const limit = request.query.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+
+    tourQuery = tourQuery.skip(skip).limit(limit);
+
+    if (request.query.page) {
+      const tourCount = await Tour.countDocuments();
+      if (skip >= tourCount) throw new Error('This page does not exist.');
+    }
+
     const tours = await tourQuery;
 
     response.status(200).json({
