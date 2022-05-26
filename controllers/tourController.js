@@ -9,7 +9,19 @@ const Tour = require('../models/tour');
 */
 exports.index = async (request, response) => {
   try {
-    const tours = await Tour.find();
+    const query = { ...request.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach((field) => delete query[field]);
+
+    const tourQuery = await Tour.find(query);
+
+    /* const tours = await Tour.find()
+      .where('duration')
+      .equals(5)
+      .where('difficulty')
+      .equals('easy'); */
+
+    const tours = await tourQuery;
 
     response.status(200).json({
       status: 'success',
