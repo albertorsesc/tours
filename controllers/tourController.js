@@ -65,36 +65,40 @@ exports.show = async (request, response) => {
 /* 
   Update a Tour by ID. 
 */
-exports.update = (request, response) => {
-  const tour = tours.find((tour) => tour.id == request.params.id);
+exports.update = async (request, response) => {
+  try {
+    const tour = await Tour.findByIdAndUpdate(request.params.id, request.body, {
+      new: true,
+      runValidators: true,
+    });
 
-  response.status(200).json({
-    status: 'success',
-    data: {
-      tour: '<Updated tour here.>',
-    },
-  });
+    response.status(200).json({
+      status: 'success',
+      data: { tour },
+    });
+  } catch (error) {
+    response.status(404).json({
+      status: 'failed',
+      message: error,
+    });
+  }
 };
 
 /* 
   Delete a Tour by ID. 
 */
-exports.destroy = (request, response) => {
-  const tour = tours.find((tour) => tour.id == request.params.id);
+exports.destroy = async (request, response) => {
+  try {
+    await Tour.findByIdAndDelete(request.params.id);
 
-  response.status(204).json({
-    status: 'success',
-    data: null,
-  });
-};
-
-exports.findOrFail = (request, response, next, id) => {
-  /* if (id * 1 > tours.length) {
-    return response.status(404).json({
-      status: 'failed',
-      message: 'Invalid ID',
+    response.status(204).json({
+      status: 'success',
+      data: null,
     });
-  } */
-
-  next();
+  } catch (error) {
+    response.status(404).json({
+      status: 'failed',
+      message: error,
+    });
+  }
 };
