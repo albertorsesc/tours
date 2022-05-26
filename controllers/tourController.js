@@ -9,17 +9,33 @@ const Tour = require('../models/tour');
 */
 exports.index = async (request, response) => {
   try {
+    console.log(request.query);
+
     const query = { ...request.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((field) => delete query[field]);
 
-    const tourQuery = await Tour.find(query);
+    let queryString = JSON.stringify(query);
+    queryString = queryString.replace(
+      /\b(gte|gt|lte|lt)\b/g,
+      (match) => `$${match}`
+    );
 
-    /* const tours = await Tour.find()
-      .where('duration')
-      .equals(5)
-      .where('difficulty')
-      .equals('easy'); */
+    let tourQuery = Tour.find(JSON.parse(queryString));
+
+    if (request.query.sort) {
+      const sortBy = request.query.sort.split(',').join(' ');
+      tourQuery = tourQuery.sort(sortBy);
+    } else {
+      tourQuery = tourQuery.sort('-createdAt');
+    }
+
+    if (request.query.fields) {
+      const fields = request.query.fields.split(',').join(' ');
+      tourQuery = tourQuery.select(fields);
+    } else {
+      tourQuery = tourQuery.select('-__v');
+    }
 
     const tours = await tourQuery;
 
