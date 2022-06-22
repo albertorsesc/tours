@@ -1,54 +1,25 @@
 const Tour = require('../models/tour');
+const ApiFeatures = require('../utils/apiFeatures');
 
-/* const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-) */
+exports.aliasTopTours = (request, response, next) => {
+  request.query.limit = '5';
+  request.query.sort = '-ratingsAverage,price';
+  request.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+
+  next();
+};
 
 /* 
   Get all Tours. 
 */
 exports.index = async (request, response) => {
   try {
-    console.log(request.query);
-
-    const query = { ...request.query };
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    excludedFields.forEach((field) => delete query[field]);
-
-    let queryString = JSON.stringify(query);
-    queryString = queryString.replace(
-      /\b(gte|gt|lte|lt)\b/g,
-      (match) => `$${match}`
-    );
-
-    let tourQuery = Tour.find(JSON.parse(queryString));
-
-    if (request.query.sort) {
-      const sortBy = request.query.sort.split(',').join(' ');
-      tourQuery = tourQuery.sort(sortBy);
-    } else {
-      tourQuery = tourQuery.sort('-createdAt');
-    }
-
-    if (request.query.fields) {
-      const fields = request.query.fields.split(',').join(' ');
-      tourQuery = tourQuery.select(fields);
-    } else {
-      tourQuery = tourQuery.select('-__v');
-    }
-
-    const page = request.query.page * 1 || 1;
-    const limit = request.query.limit * 1 || 100;
-    const skip = (page - 1) * limit;
-
-    tourQuery = tourQuery.skip(skip).limit(limit);
-
-    if (request.query.page) {
-      const tourCount = await Tour.countDocuments();
-      if (skip >= tourCount) throw new Error('This page does not exist.');
-    }
-
-    const tours = await tourQuery;
+    const features = new ApiFeatures(Tour.find(), request.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const tours = await features.query;
 
     response.status(200).json({
       status: 'success',
@@ -133,6 +104,94 @@ exports.destroy = async (request, response) => {
     response.status(204).json({
       status: 'success',
       data: null,
+    });
+  } catch (error) {
+    response.status(404).json({
+      status: 'failed',
+      message: error,
+    });
+  }
+};
+
+exports.getTourStats = async (request, response) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          _id: { $toUpper: '$difficulty' },
+          toursCount: { $sum: 1 },
+          ratingsCount: { $sum: '$ratingsQuantity' },
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+      {
+        $sort: { avgPrice: 1 },
+      },
+      // {
+      //   $match: { _id: { $ne: 'EASY' } },
+      // },
+    ]);
+
+    response.status(200).json({
+      status: 'success',
+      data: { stats },
+    });
+  } catch (error) {
+    response.status(404).json({
+      status: 'failed',
+      message: error,
+    });
+  }
+};
+
+exports.getMonthlyPlan = async (request, response) => {
+  try {
+    const year = request.params.year * 1;
+
+    const plan = await Tour.aggregate([
+      {
+        $unwind: '$startDates',
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: '$startDates' },
+          tourByStartDateCount: { $sum: 1 },
+          tours: { $push: '$name'},
+        },
+      },
+      {
+        $addFields: { month: '$_id' },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+      {
+        $sort: { tourByStartDateCount: -1 },
+      },
+      {
+        $limit: 12,
+      },
+    ]);
+
+    response.status(200).json({
+      status: 'success',
+      data: { plan },
     });
   } catch (error) {
     response.status(404).json({

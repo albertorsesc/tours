@@ -1,0 +1,4 @@
+// Read from JSON file.
+const result = JSON.parse(
+  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
+)
