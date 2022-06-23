@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 
-const tourSchema = new mongoose.Schema(
+const schema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -66,32 +66,32 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
-tourSchema.virtual('durationWeeks').get(function () {
+schema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
 // Document Middleware:
 //  Runs before .save() and .create()
-tourSchema.pre('save', function (next) {
+schema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
 
   next();
 });
 
-/* tourSchema.pre('save', function (next) {
+/* schema.pre('save', function (next) {
   console.log('Will save document...');
 
   next();
 });
 
-tourSchema.post('save', function(document, next) {
+schema.post('save', function(document, next) {
   console.log(document);
 
   next();
 }); */
 
 // Query Middleware
-tourSchema.pre(/^find/, function (next) {
+schema.pre(/^find/, function (next) {
   this.find({ isSecret: { $ne: true } });
   this.start = Date.now();
 
@@ -99,13 +99,20 @@ tourSchema.pre(/^find/, function (next) {
 });
 
 // eslint-disable-next-line prefer-arrow-callback
-tourSchema.post(/^find/, function (documents, next) {
+schema.post(/^find/, function (documents, next) {
   console.log(`Query took: ${Date.now() - this.start} milliseconds`);
   console.log(documents);
 
   next();
 });
 
-const Tour = mongoose.model('Tour', tourSchema);
+// Aggregation Middleware
+// eslint-disable-next-line prefer-arrow-callback
+schema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { isSecret: { $ne: true } } });
+  next();
+});
+
+const Tour = mongoose.model('Tour', schema);
 
 module.exports = Tour;
