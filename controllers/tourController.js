@@ -170,7 +170,7 @@ exports.getMonthlyPlan = async (request, response) => {
         $group: {
           _id: { $month: '$startDates' },
           tourByStartDateCount: { $sum: 1 },
-          tours: { $push: '$name'},
+          tours: { $push: '$name' },
         },
       },
       {
