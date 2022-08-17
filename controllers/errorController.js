@@ -1,6 +1,8 @@
 const AppError = require('../utils/appError');
 
 const DUPLICATION_ERROR_CODE_MONGODB = 11000;
+const CAST_ERROR_CODE_MONGODB = 'CastError';
+const VALIDATION_ERROR_PREFIX_MONGODB = 'Validation';
 
 const handleCastErrorDb = (error) => {
   const message = `Invalid ${error.path}: ${error.value}.`;
@@ -10,6 +12,13 @@ const handleCastErrorDb = (error) => {
 
 const handleDuplicateFieldsDB = (error) => {
   const message = `Duplicate field value: "${error.keyValue.name}". Please use another value!`;
+  return new AppError(message, 400);
+};
+
+const handleValidationErrorsDB = (error) => {
+  const errors = Object.values(error.errors).map((err) => err.message);
+
+  const message = `Invalid input data. ${errors.join('. ')}`;
   return new AppError(message, 400);
 };
 
@@ -47,12 +56,16 @@ module.exports = (error, request, response, next) => {
   } else if (process.env.NODE_ENV === 'production') {
     let err = { ...error };
 
-    if (err.name === 'CastError') {
+    if (err.name === CAST_ERROR_CODE_MONGODB) {
       err = handleCastErrorDb(err);
     }
 
     if (err.code === DUPLICATION_ERROR_CODE_MONGODB) {
       err = handleDuplicateFieldsDB(err);
+    }
+
+    if (err._message.includes(VALIDATION_ERROR_PREFIX_MONGODB)) {
+      err = handleValidationErrorsDB(err);
     }
 
     prodResponse(err, response);
