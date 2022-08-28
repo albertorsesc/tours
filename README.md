@@ -4,7 +4,7 @@ Node.js app to manage Tours.
 
 ## Prerequisites
 
-- Node `>=v14.16.1`
+- Node `>=v16.14.0`
 - MongoDB (Compass)
 
 ### Installing
