@@ -22,6 +22,12 @@ const handleValidationErrorsDB = (error) => {
   return new AppError(message, 400);
 };
 
+const handleJwtError = () =>
+  new AppError('Invalid token. Please log in again!', 401);
+
+const handleJwtExpiredError = () =>
+  new AppError('Your token has expired, Log in again.!', 401);
+
 const devResponse = (error, response) => {
   response.status(error.statusCode).json({
     status: error.status,
@@ -64,8 +70,19 @@ module.exports = (error, request, response, next) => {
       err = handleDuplicateFieldsDB(err);
     }
 
-    if (err._message.includes(VALIDATION_ERROR_PREFIX_MONGODB)) {
+    if (
+      err._message &&
+      err._message.includes(VALIDATION_ERROR_PREFIX_MONGODB)
+    ) {
       err = handleValidationErrorsDB(err);
+    }
+
+    if (err.name === 'JsonWebTokenError') {
+      err = handleJwtError();
+    }
+
+    if (err.name === 'TokenExpiredError') {
+      err = handleJwtExpiredError();
     }
 
     prodResponse(err, response);

@@ -1,3 +1,4 @@
+const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const catchAsync = require('../utils/catchAsync');
@@ -36,7 +37,7 @@ exports.login = catchAsync(async (request, response, next) => {
 
   const user = await User.findOne({ email }).select('+password');
 
-  if (!user || !(await user.correctPassword(password, user.password))) {
+  if (!user || !(await user.encryptPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password.', 401));
   }
 
@@ -46,4 +47,33 @@ exports.login = catchAsync(async (request, response, next) => {
     status: 'success',
     token,
   });
+});
+
+exports.protect = catchAsync(async (request, response, next) => {
+  let token;
+  if (
+    request.headers.authorization &&
+    request.headers.authorization.startsWith('Bearer')
+  ) {
+    token = request.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) {
+    return next(new AppError('You are not logged in!', 401));
+  }
+
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(new AppError('This user does not exist', 401));
+  }
+
+  if (currentUser.updatePasswordChangedAt(decoded.iat)) {
+    return next(new AppError('User recently changed password!', 401));
+  }
+
+  request.user = currentUser;
+
+  next();
 });
