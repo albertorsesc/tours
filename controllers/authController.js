@@ -13,6 +13,7 @@ exports.signup = catchAsync(async (request, response, next) => {
   const newUser = await User.create({
     name: request.body.name,
     email: request.body.email,
+    role: request.body.role,
     password: request.body.password,
     passwordConfirmation: request.body.passwordConfirmation,
   });
@@ -77,3 +78,15 @@ exports.protect = catchAsync(async (request, response, next) => {
 
   next();
 });
+
+exports.restrictTo =
+  (...roles) =>
+  (request, response, next) => {
+    if (!roles.includes(request.user.role)) {
+      return next(
+        new AppError("You don't have permission to perform this action", 403)
+      );
+    }
+
+    next();
+  };
