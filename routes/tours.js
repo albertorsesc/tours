@@ -21,6 +21,10 @@ router
   .route('/:id')
   .get(controller.show)
   .patch(controller.update)
-  .delete(controller.destroy);
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    controller.destroy
+  );
 
 module.exports = router;
