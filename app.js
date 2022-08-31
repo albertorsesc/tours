@@ -52,6 +52,7 @@ const errorHandler = require('./controllers/errorController');
 
 const tourRouter = require('./routes/tours');
 const userRouter = require('./routes/users');
+const reviewRouter = require('./routes/reviews');
 
 app.use((request, response, next) => {
   request.requestTime = new Date().toISOString();
@@ -61,6 +62,7 @@ app.use((request, response, next) => {
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // # Routes
 
