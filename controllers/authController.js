@@ -11,6 +11,18 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
+const generateAndReturnToken = (user, statusCode, response) => {
+  const token = signToken(user._id);
+
+  response.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.signup = catchAsync(async (request, response, next) => {
   const newUser = await User.create({
     name: request.body.name,
@@ -20,15 +32,7 @@ exports.signup = catchAsync(async (request, response, next) => {
     passwordConfirmation: request.body.passwordConfirmation,
   });
 
-  const token = signToken(newUser._id);
-
-  response.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  generateAndReturnToken(newUser, 201, response);
 });
 
 exports.login = catchAsync(async (request, response, next) => {
@@ -40,16 +44,11 @@ exports.login = catchAsync(async (request, response, next) => {
 
   const user = await User.findOne({ email }).select('+password');
 
-  if (!user || !(await user.encryptPassword(password, user.password))) {
+  if (!user || !(await user.validatePassword(password, user.password))) {
     return next(new AppError('Incorrect email or password.', 401));
   }
 
-  const token = signToken(user._id);
-
-  response.status(200).json({
-    status: 'success',
-    token,
-  });
+  generateAndReturnToken(user, 200, response);
 });
 
 exports.protect = catchAsync(async (request, response, next) => {
@@ -158,10 +157,22 @@ exports.resetPassword = catchAsync(async (request, response, next) => {
 
   await user.save();
 
-  const token = signToken(user._id);
+  generateAndReturnToken(user, 200, response);
+});
 
-  response.status(200).json({
-    status: 'success',
-    token,
-  });
+exports.updatePassword = catchAsync(async (request, response, next) => {
+  const user = await User.findById(request.user.id).select('+password');
+
+  if (
+    !(await user.validatePassword(request.body.currentPassword, user.password))
+  ) {
+    return next(new AppError('Your current password is incorrect.', 401));
+  }
+
+  user.password = request.body.password;
+  user.passwordConfirmation = request.body.passwordConfirmation;
+
+  await user.save();
+
+  generateAndReturnToken(user, 200, response);
 });

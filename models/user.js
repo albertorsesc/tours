@@ -63,7 +63,7 @@ schema.pre('save', function (next) {
   next();
 });
 
-schema.methods.encryptPassword = async function (
+schema.methods.validatePassword = async function (
   candidatePassword,
   userPassword
 ) {
