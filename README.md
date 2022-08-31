@@ -48,6 +48,7 @@ MIT
 * [x] Security HTTP headers.
 * [x] NoSQL injection prevention.
 * [x] XSS prevention.
+* [x] Parameter pollution prevention.
 * [] Implement Test suite.
 * [] Max login attempts.
 * [] Filter malicious regular expressions.
