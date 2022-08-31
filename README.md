@@ -23,6 +23,14 @@ Create and configure "config.env" file:
 
 Set MongoDB in your `config.env` file.
 
+Import Development data
+
+`node ./dev-data/data/import-dev-data.js --import`
+
+To Delete Development Data
+
+`node ./dev-data/data/import-dev-data.js --delete`
+
 Start app:
 
 `npm run start`

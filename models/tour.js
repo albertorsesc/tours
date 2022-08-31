@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
+const User = require('./user');
 
 const schema = new mongoose.Schema(
   {
@@ -79,6 +80,35 @@ const schema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -90,22 +120,17 @@ schema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
-// Document Middleware:
-//  Runs before .save() and .create()
+// Document Middleware: Runs before .save() and .create()
 schema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
 
   next();
 });
 
-/* schema.pre('save', function (next) {
-  console.log('Will save document...');
-
-  next();
-});
-
-schema.post('save', function(document, next) {
-  console.log(document);
+// Tour/User Embedding.
+/* schema.pre('save', async function (next) {
+  const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+  this.guides = await Promise.all(guidesPromises);
 
   next();
 }); */
@@ -114,6 +139,15 @@ schema.post('save', function(document, next) {
 schema.pre(/^find/, function (next) {
   this.find({ isSecret: { $ne: true } });
   this.start = Date.now();
+
+  next();
+});
+
+schema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
 
   next();
 });
