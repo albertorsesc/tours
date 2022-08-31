@@ -38,3 +38,16 @@ MIT
 ## Acknowledgments
 
   - [Jonas Schmedtmann](https://twitter.com/jonasschmedtman)
+
+## To do:
+
+#### Security
+
+* [] Rate limiting (express-rate-limit)
+* [] Max login attempts.
+* [] HTTP headers (helmet).
+* [] Limit body payload.
+* [] Filter malicious regular expressions.
+* [] CSRF protection (csurf)
+* [] JWT black list.
+* [] Confirm email.
