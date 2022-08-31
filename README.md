@@ -44,10 +44,10 @@ MIT
 #### Security
 
 * [x] Rate limiting
-* [] Limit body payload.
+* [x] Limit body payload.
+* [x] HTTP headers (helmet).
 * [] Implement Test suite.
 * [] Max login attempts.
-* [] HTTP headers (helmet).
 * [] Filter malicious regular expressions.
 * [] CSRF protection (csurf)
 * [] JWT black list.
