@@ -43,8 +43,8 @@ MIT
 
 #### Security
 
+* [x] Rate limiting
 * [] Implement Test suite.
-* [] Rate limiting (express-rate-limit)
 * [] Max login attempts.
 * [] HTTP headers (helmet).
 * [] Limit body payload.
