@@ -52,6 +52,17 @@ schema.pre('save', async function (next) {
   next();
 });
 
+schema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) {
+    return next();
+  }
+
+  // -1 sec, ensuring token is created after password changed.
+  this.passwordChangedAt = Date.now() - 1000;
+
+  next();
+});
+
 schema.methods.encryptPassword = async function (
   candidatePassword,
   userPassword
