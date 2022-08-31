@@ -45,7 +45,9 @@ MIT
 
 * [x] Rate limiting
 * [x] Limit body payload.
-* [x] HTTP headers (helmet).
+* [x] Security HTTP headers.
+* [x] NoSQL injection prevention.
+* [x] XSS prevention.
 * [] Implement Test suite.
 * [] Max login attempts.
 * [] Filter malicious regular expressions.
