@@ -43,10 +43,6 @@ Contributions welcome.
 
 MIT
 
-## Acknowledgments
-
-  - [Jonas Schmedtmann](https://twitter.com/jonasschmedtman)
-
 ## To do:
 
 #### Security
