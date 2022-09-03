@@ -120,6 +120,12 @@ schema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+schema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+});
+
 // Document Middleware: Runs before .save() and .create()
 schema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });

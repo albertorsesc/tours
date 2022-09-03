@@ -34,10 +34,13 @@ const schema = new mongoose.Schema(
 );
 
 schema.pre(/^find/, function (next) {
+  /* 
+  Deleted because it creates recursive relation loading:
+  tour.reviews[0].tour.reviews
+  this.populate({ path: 'tour', select: 'name', }); 
+  */
+
   this.populate({
-    path: 'tour',
-    select: 'name',
-  }).populate({
     path: 'user',
     select: 'name photo',
   });
