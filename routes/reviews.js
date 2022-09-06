@@ -10,9 +10,10 @@ router
   .post(
     authController.protect,
     authController.restrictTo('user'),
+    controller.setModelsFromRequest,
     controller.store
   );
 
-router.route('/:id').delete(controller.destroy);
+router.route('/:id').patch(controller.update).delete(controller.destroy);
 
 module.exports = router;

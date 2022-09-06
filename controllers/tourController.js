@@ -31,18 +31,6 @@ exports.index = catchAsync(async (request, response, next) => {
 });
 
 /* 
-  Store a new Tour. 
-*/
-exports.store = catchAsync(async (request, response, next) => {
-  const tour = await Tour.create(request.body);
-
-  response.status(201).json({
-    status: 'success',
-    data: { tour },
-  });
-});
-
-/* 
   Find a Tour by ID. 
 */
 exports.show = catchAsync(async (request, response, next) => {
@@ -58,25 +46,8 @@ exports.show = catchAsync(async (request, response, next) => {
   });
 });
 
-/* 
-  Update a Tour by ID. 
-*/
-exports.update = catchAsync(async (request, response, next) => {
-  const tour = await Tour.findByIdAndUpdate(request.params.id, request.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!tour) {
-    return next(new AppError('No tour found with provided ID', 404));
-  }
-
-  response.status(200).json({
-    status: 'success',
-    data: { tour },
-  });
-});
-
+exports.store = factory.store(Tour);
+exports.update = factory.update(Tour);
 exports.destroy = factory.delete(Tour);
 
 exports.getTourStats = catchAsync(async (request, response, next) => {

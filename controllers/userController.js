@@ -27,12 +27,7 @@ exports.show = (request, response) => {
   });
 };
 
-exports.update = (request, response) => {
-  response.status(500).json({
-    status: 'error',
-    message: 'This route is not defined.',
-  });
-};
+exports.update = factory.update(User);
 
 exports.destroy = factory.delete(User);
 

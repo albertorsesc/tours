@@ -18,21 +18,17 @@ exports.index = catchAsync(async (request, response, next) => {
   });
 });
 
-exports.store = catchAsync(async (request, response, next) => {
+exports.setModelsFromRequest = (request, response, next) => {
   if (!request.body.tour) {
     request.body.tour = request.params.tourId;
   }
   if (!request.body.user) {
     request.body.user = request.user.id;
   }
-  const review = await Review.create(request.body);
 
-  response.status(201).json({
-    status: 'success',
-    data: {
-      review,
-    },
-  });
-});
+  next();
+};
 
+exports.store = factory.store(Review);
+exports.update = factory.update(Review);
 exports.destroy = factory.delete(Review);
