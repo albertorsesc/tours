@@ -13,4 +13,6 @@ router
     controller.store
   );
 
+router.route('/:id').delete(controller.destroy);
+
 module.exports = router;

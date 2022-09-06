@@ -1,5 +1,6 @@
 const Review = require('../models/review');
 const catchAsync = require('../utils/catchAsync');
+const factory = require('./handlerFactory');
 
 exports.index = catchAsync(async (request, response, next) => {
   let filter = {};
@@ -33,3 +34,5 @@ exports.store = catchAsync(async (request, response, next) => {
     },
   });
 });
+
+exports.destroy = factory.delete(Review);
