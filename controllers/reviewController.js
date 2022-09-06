@@ -1,22 +1,11 @@
 const Review = require('../models/review');
-const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 
-exports.index = catchAsync(async (request, response, next) => {
-  let filter = {};
-  if (request.params.tourId) {
-    filter = { tour: request.params.tourId };
-  }
-  const reviews = await Review.find(filter);
-
-  response.status(200).json({
-    status: 'success',
-    results: reviews.length,
-    data: {
-      reviews,
-    },
-  });
-});
+exports.index = factory.index(Review);
+exports.show = factory.show(Review);
+exports.store = factory.store(Review);
+exports.update = factory.update(Review);
+exports.destroy = factory.delete(Review);
 
 exports.setModelsFromRequest = (request, response, next) => {
   if (!request.body.tour) {
@@ -28,7 +17,3 @@ exports.setModelsFromRequest = (request, response, next) => {
 
   next();
 };
-
-exports.store = factory.store(Review);
-exports.update = factory.update(Review);
-exports.destroy = factory.delete(Review);

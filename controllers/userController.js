@@ -3,32 +3,9 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
-exports.index = catchAsync(async (request, response, next) => {
-  const users = await User.find();
-
-  response.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: { users },
-  });
-});
-
-exports.store = (request, response) => {
-  response.status(500).json({
-    status: 'error',
-    message: 'This route is not defined.',
-  });
-};
-
-exports.show = (request, response) => {
-  response.status(500).json({
-    status: 'error',
-    message: 'This route is not defined.',
-  });
-};
-
+exports.index = factory.index(User);
+exports.show = factory.show(User);
 exports.update = factory.update(User);
-
 exports.destroy = factory.delete(User);
 
 const filterObject = (object, ...allowedFields) => {
@@ -71,3 +48,10 @@ exports.deleteMe = catchAsync(async (request, response, next) => {
     data: null,
   });
 });
+
+exports.store = (request, response) => {
+  response.status(500).json({
+    status: 'error',
+    message: 'This route is not defined. Please Sign up.',
+  });
+};

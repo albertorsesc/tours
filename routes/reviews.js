@@ -14,6 +14,10 @@ router
     controller.store
   );
 
-router.route('/:id').patch(controller.update).delete(controller.destroy);
+router
+  .route('/:id')
+  .get(controller.show)
+  .patch(controller.update)
+  .delete(controller.destroy);
 
 module.exports = router;

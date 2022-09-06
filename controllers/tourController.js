@@ -1,51 +1,9 @@
 const Tour = require('../models/tour');
-const ApiFeatures = require('../utils/apiFeatures');
-const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 
-exports.aliasTopTours = (request, response, next) => {
-  request.query.limit = '5';
-  request.query.sort = '-ratingsAverage,price';
-  request.query.fields = 'name,price,ratingsAverage,summary,difficulty';
-
-  next();
-};
-
-/* 
-  Get all Tours. 
-*/
-exports.index = catchAsync(async (request, response, next) => {
-  const features = new ApiFeatures(Tour.find(), request.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tours = await features.query;
-
-  response.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: { tours },
-  });
-});
-
-/* 
-  Find a Tour by ID. 
-*/
-exports.show = catchAsync(async (request, response, next) => {
-  const tour = await Tour.findById(request.params.id).populate('reviews');
-
-  if (!tour) {
-    return next(new AppError('No tour found with provided ID', 404));
-  }
-
-  response.status(200).json({
-    status: 'success',
-    data: { tour },
-  });
-});
-
+exports.index = factory.index(Tour);
+exports.show = factory.show(Tour, { path: 'reviews' });
 exports.store = factory.store(Tour);
 exports.update = factory.update(Tour);
 exports.destroy = factory.delete(Tour);
@@ -123,3 +81,11 @@ exports.getMonthlyPlan = catchAsync(async (request, response, next) => {
     data: { plan },
   });
 });
+
+exports.aliasTopTours = (request, response, next) => {
+  request.query.limit = '5';
+  request.query.sort = '-ratingsAverage,price';
+  request.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+
+  next();
+};
