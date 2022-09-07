@@ -116,6 +116,15 @@ const schema = new mongoose.Schema(
   }
 );
 
+schema.index({
+  price: 1,
+  ratingsAverage: -1,
+});
+
+schema.index({
+  slug: 1,
+});
+
 schema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });

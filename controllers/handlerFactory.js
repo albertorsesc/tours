@@ -15,7 +15,7 @@ exports.index = (Model) =>
       .sort()
       .limitFields()
       .paginate();
-    const document = await features.query;
+    const document = await features.query; // .explain()
 
     response.status(200).json({
       status: 'success',
