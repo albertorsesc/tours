@@ -35,6 +35,10 @@ Start app:
 
 `npm run start`
 
+## PWD
+
+Users' password: `test1234`
+
 ## Contributing
 
 Contributions welcome.
