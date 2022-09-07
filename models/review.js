@@ -34,6 +34,8 @@ const schema = new mongoose.Schema(
   }
 );
 
+schema.index({ tour: 1, user: 1 }, { unique: true });
+
 schema.pre(/^find/, function (next) {
   /* 
   Deleted because it creates recursive relation loading:
