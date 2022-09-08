@@ -6,6 +6,14 @@ const router = express.Router();
 const reviewRouter = require('./reviews');
 
 router
+  .route('/near/:distance/center/:coordinates/unit/:unit')
+  .get(controller.getToursWithinDistance);
+
+router
+  .route('/distances/:coordinates/unit/:unit')
+  .get(controller.getToursByDistance);
+
+router
   .route('/')
   .get(controller.index)
   .post(

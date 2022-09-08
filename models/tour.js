@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const validator = require('validator');
-const User = require('./user');
+// const validator = require('validator');
+// const User = require('./user');
 
 const schema = new mongoose.Schema(
   {
@@ -36,7 +36,7 @@ const schema = new mongoose.Schema(
       default: 4.5,
       min: [1, 'Rating must be above or equal 1.0'],
       max: [5, 'Rating must be below or equal to 5.0'],
-      set: (value) => Math.round(value * 10) / 10,
+      set: value => Math.round(value * 10) / 10,
     },
     ratingsQuantity: {
       type: Number,
@@ -126,6 +126,10 @@ schema.index({
   slug: 1,
 });
 
+schema.index({
+  startLocation: '2dsphere',
+});
+
 schema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
@@ -178,9 +182,9 @@ schema.post(/^find/, function (documents, next) {
 
 // Aggregation Middleware
 // eslint-disable-next-line prefer-arrow-callback
-schema.pre('aggregate', function (next) {
+/* schema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { isSecret: { $ne: true } } });
   next();
-});
+}); */
 
 module.exports = mongoose.model('Tour', schema);
