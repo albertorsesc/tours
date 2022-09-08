@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 
 const app = express();
@@ -8,7 +9,13 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
 // # Global Middlewares
+
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(helmet());
 
 if (process.env.NODE_ENV === 'development') {
@@ -45,8 +52,6 @@ app.use(
   })
 );
 
-app.use(express.static(`${__dirname}/public`));
-
 const AppError = require('./utils/appError');
 const errorHandler = require('./controllers/errorController');
 
@@ -60,6 +65,12 @@ app.use((request, response, next) => {
   next();
 });
 
+// Web Routes
+app.get('/', (request, response) => {
+  response.status(200).render('layout');
+});
+
+// API Routes
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
