@@ -39,6 +39,11 @@ Start app:
 
 Users' password: `test1234`
 
+## Notes
+
+When importing data through the CLI, make sure to comment out the `save` middlewares in `models/user.js` which are used to encrypt the user's password,
+if not commented out, the already encrypted password in the `dev-data/data/users.json` file will be encrypted again. After importing it is now safe to uncomment.
+
 ## Contributing
 
 Contributions welcome.
