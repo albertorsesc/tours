@@ -58,6 +58,7 @@ const errorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tours');
 const userRouter = require('./routes/users');
 const reviewRouter = require('./routes/reviews');
+const webRouter = require('./routes/web');
 
 app.use((request, response, next) => {
   request.requestTime = new Date().toISOString();
@@ -66,14 +67,10 @@ app.use((request, response, next) => {
 });
 
 // Web Routes
-app.get('/', (request, response) => {
-  response.status(200).render('layout', {
-    tour: 'The Forest hiker',
-    user: 'Alberto',
-  });
-});
+
 
 // API Routes
+app.use('/', webRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
