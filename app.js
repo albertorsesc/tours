@@ -67,7 +67,10 @@ app.use((request, response, next) => {
 
 // Web Routes
 app.get('/', (request, response) => {
-  response.status(200).render('layout');
+  response.status(200).render('layout', {
+    tour: 'The Forest hiker',
+    user: 'Alberto',
+  });
 });
 
 // API Routes
