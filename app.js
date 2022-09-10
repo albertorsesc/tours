@@ -16,7 +16,21 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(helmet());
+// app.use(helmet.contentSecurityPolicy()); - Need to allow Mapbox
+app.use(helmet.crossOriginEmbedderPolicy());
+app.use(helmet.crossOriginOpenerPolicy());
+app.use(helmet.crossOriginResourcePolicy());
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.originAgentCluster());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -67,7 +81,6 @@ app.use((request, response, next) => {
 });
 
 // Web Routes
-
 
 // API Routes
 app.use('/', webRouter);

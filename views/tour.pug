@@ -1,6 +1,10 @@
 extends layout 
 include _review_card
 
+block append head
+  script(src='/js/mapbox-sdk.js')
+  link(href='/css/mapbox.css' rel='stylesheet')
+
 mixin overviewBox(label, icon, details)
   .overview-box__detail
     svg.overview-box__icon
@@ -61,7 +65,7 @@ block content
         img.picture-box__img(src=`/img/tours/${img}`, alt=`${tour.name} Tour ${index + 1}`, class=`picture-box__img--${index + 1}`)
 
   section.section-map
-    #map
+    #map(data-locations=`${JSON.stringify(tour.locations)}`)
 
   section.section-reviews
     .reviews
