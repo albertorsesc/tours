@@ -2,9 +2,9 @@
 
 Node.js app to manage Tours.
 
-<img width="400" alt="Tours" src="https://raw.githubusercontent.com/albertorsesc/tours/main/public/img/img-1.png" style="border-radius: 0.5rem;">
+<img width="800" alt="Tours" src="https://raw.githubusercontent.com/albertorsesc/tours/main/public/img/img-1.png" style="border-radius: 0.5rem;">
 
-<img width="400" alt="Tours" src="https://raw.githubusercontent.com/albertorsesc/tours/main/public/img/img.png" style="border-radius: 0.5rem;">
+<img width="800" alt="Tours" src="https://raw.githubusercontent.com/albertorsesc/tours/main/public/img/img.png" style="border-radius: 0.5rem;">
 
 ## Prerequisites
 
